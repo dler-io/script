@@ -141,7 +141,7 @@ optimize_kernel_params() {
     elif [ "$mem_total_mb" -lt 8000 ]; then
         tcp_max_buffer="268435456"
         OUT_INFO "检测到内存: ${mem_display}，使用缓冲区 (256MB)"
-    elif [ "$mem_total_mb" -lt 32000 ]; then
+    elif [ "$mem_total_mb" -lt 16000 ]; then
         tcp_max_buffer="536870912"
         OUT_INFO "检测到内存: ${mem_display}，使用缓冲区 (512MB)"
     else
@@ -164,13 +164,33 @@ net.ipv4.tcp_max_syn_backlog    = 4096
 net.ipv4.tcp_congestion_control = bbr
 net.ipv4.tcp_rmem               = 16384 16777216 ${tcp_max_buffer}
 net.ipv4.tcp_wmem               = 16384 16777216 ${tcp_max_buffer}
-net.ipv4.tcp_adv_win_scale      = 1
+net.ipv4.tcp_adv_win_scale      = 4
 net.ipv4.tcp_sack               = 1
 net.ipv4.tcp_timestamps         = 1
 net.ipv4.tcp_fastopen           = 3
+net.ipv4.tcp_tw_reuse           = 1
+net.ipv4.tcp_fin_timeout        = 10
+net.ipv4.tcp_slow_start_after_idle = 0
+net.ipv4.tcp_max_tw_buckets     = 32768
+net.ipv4.tcp_window_scaling     = 1
+net.ipv4.tcp_moderate_rcvbuf    = 1
+net.ipv4.tcp_mtu_probing        = 1
+net.ipv4.tcp_syncookies         = 1
+net.ipv4.tcp_synack_retries     = 2
+net.ipv4.tcp_syn_retries        = 3
 net.ipv4.ip_local_port_range    = 1024 65535
-kernel.panic                    = 0
-vm.swappiness                   = 0"
+net.ipv4.route.gc_timeout       = 100
+net.ipv4.conf.all.arp_announce  = 2
+net.ipv4.conf.default.arp_announce = 2
+net.ipv4.conf.all.arp_ignore    = 1
+net.ipv4.conf.default.arp_ignore = 1
+kernel.panic                    = 1
+kernel.sysrq                    = 1
+kernel.numa_balancing           = 0
+kernel.sched_autogroup_enabled  = 0
+vm.swappiness                   = 0
+vm.dirty_ratio                  = 10
+vm.dirty_background_ratio       = 5"
 
     # Ensure directory exists
     mkdir -p /etc/sysctl.d 2>/dev/null || true
